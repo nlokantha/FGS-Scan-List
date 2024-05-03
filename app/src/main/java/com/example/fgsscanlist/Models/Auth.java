@@ -3,7 +3,9 @@ package com.example.fgsscanlist.Models;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class Auth {
+import java.io.Serializable;
+
+public class Auth implements Serializable {
     /*
     "token":"eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJKYXlKYXlNaWxscyI
 sInN1YiI6IkF1dGhlbnRpY2F0aW9uIiwiZXhwIjoxNzE0NDU3NTgzLCJpYXQiOjE3MTQzNzExODMs

@@ -6,8 +6,12 @@ import android.os.Bundle;
 
 import com.example.fgsscanlist.Fragments.HomeFragment;
 import com.example.fgsscanlist.Fragments.LoginFragment;
+import com.example.fgsscanlist.Fragments.ViewFragment;
+import com.example.fgsscanlist.Models.Auth;
 
- public class MainActivity extends AppCompatActivity implements LoginFragment.LoginFragmentListener, HomeFragment.HomeFragmentListener {
+ public class MainActivity extends AppCompatActivity implements LoginFragment.LoginFragmentListener,
+         HomeFragment.HomeFragmentListener, ViewFragment.ViewFragmentListener {
+     Auth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -20,9 +24,30 @@ import com.example.fgsscanlist.Fragments.LoginFragment;
     }
 
      @Override
-     public void authSuccessfully() {
+     public void authSuccessfully(Auth auth) {
+        this.mAuth = auth;
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.rootView,new HomeFragment())
                 .commit();
+     }
+
+     @Override
+     public void gotoViewFragment() {
+         getSupportFragmentManager().beginTransaction()
+                 .replace(R.id.rootView,new ViewFragment())
+                 .addToBackStack(null)
+                 .commit();
+     }
+
+     @Override
+     public void logout() {
+         getSupportFragmentManager().beginTransaction()
+                 .replace(R.id.rootView,new LoginFragment())
+                 .commit();
+     }
+
+     @Override
+     public void gotoHomeFragment() {
+         getSupportFragmentManager().popBackStack();
      }
  }

@@ -55,8 +55,6 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
-                mListener.authSuccessfully();
-
                 String userName = binding.editTextUserName.getText().toString();
                 String password = binding.editTextPassword.getText().toString();
 
@@ -73,7 +71,7 @@ public class LoginFragment extends Fragment {
 
 
                     Request request = new Request.Builder()
-                            .url("http://192.168.40.25:8080/DBConnector/authentication")
+                            .url("http://192.168.40.25:8080/DBConnector/rest/user/authentication")
                             .post(formBody)
                             .build();
 
@@ -91,7 +89,13 @@ public class LoginFragment extends Fragment {
                                 try {
                                     JSONObject jsonObject = new JSONObject(body);
                                     Auth auth = new Auth(jsonObject);
-
+                                    getActivity().runOnUiThread(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            mListener.authSuccessfully(auth);
+                                            Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
+                                        }
+                                    });
                                 } catch (JSONException e) {
                                     throw new RuntimeException(e);
                                 }
@@ -121,6 +125,6 @@ public class LoginFragment extends Fragment {
     }
 
     public interface LoginFragmentListener{
-        void authSuccessfully();
+        void authSuccessfully(Auth auth);
     }
 }
