@@ -22,12 +22,11 @@ import com.example.fgsscanlist.Models.Auth;
                 .replace(R.id.rootView,new LoginFragment())
                 .commit();
     }
-
      @Override
      public void authSuccessfully(Auth auth) {
         this.mAuth = auth;
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.rootView,new HomeFragment())
+                .replace(R.id.rootView,HomeFragment.newInstance(mAuth))
                 .commit();
      }
 
@@ -41,6 +40,7 @@ import com.example.fgsscanlist.Models.Auth;
 
      @Override
      public void logout() {
+        mAuth = null;
          getSupportFragmentManager().beginTransaction()
                  .replace(R.id.rootView,new LoginFragment())
                  .commit();

@@ -25,6 +25,7 @@ import java.io.IOException;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.FormBody;
+import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -35,18 +36,24 @@ public class LoginFragment extends Fragment {
     public LoginFragment() {
         // Required empty public constructor
     }
+
     FragmentLoginBinding binding;
-    private final OkHttpClient client = new OkHttpClient();
+    private OkHttpClient client;
     private static final String TAG = "demo";
+
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
-        binding = FragmentLoginBinding.inflate(inflater,container,false);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        binding = FragmentLoginBinding.inflate(inflater, container, false);
         return binding.getRoot();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        client = new OkHttpClient();
+
+//        binding.editTextUserName.setText("b@b.com");
+//        binding.editTextPassword.setText("test123");
 
         binding.editTextUserName.setText("FGS");
         binding.editTextPassword.setText("fgs@user");
@@ -55,37 +62,52 @@ public class LoginFragment extends Fragment {
             @Override
             public void onClick(View v) {
 
+
                 String userName = binding.editTextUserName.getText().toString();
                 String password = binding.editTextPassword.getText().toString();
 
-                if (userName.isEmpty()){
+                if (userName.isEmpty()) {
                     Toast.makeText(getActivity(), "Please Enter User Name", Toast.LENGTH_SHORT).show();
                 } else if (password.isEmpty()) {
                     Toast.makeText(getActivity(), "Please Enter Password", Toast.LENGTH_SHORT).show();
                 } else {
 
-                    RequestBody formBody = new FormBody.Builder()
-                            .add("username", userName)
-                            .add("password", password)
-                            .build();
+                    JSONObject jsonBody = new JSONObject();
+                    try {
+                        jsonBody.put("username", userName);
+                        jsonBody.put("password", password);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
 
+                    RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json"));
 
                     Request request = new Request.Builder()
                             .url("http://192.168.40.25:8080/DBConnector/rest/user/authentication")
-                            .post(formBody)
+                            .header("Content-Type", "application/json")
+                            .header("Accept", "*/*")
+                            .header("Access-Control-Allow-Headers", "Content-Type")
+                            .post(requestBody)
                             .build();
 
                     client.newCall(request).enqueue(new Callback() {
                         @Override
                         public void onFailure(@NonNull Call call, @NonNull IOException e) {
                             e.printStackTrace();
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    Toast.makeText(getActivity(), "Network Error!!!!", Toast.LENGTH_SHORT).show();
+                                }
+                            });
                         }
 
                         @Override
                         public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
-                            if (response.isSuccessful()){
+                            if (response.isSuccessful()) {
                                 String body = response.body().string();
-                                Log.d(TAG, "onResponse: " + body);
+                                Log.d(TAG, "onResponse: login body = " + body);
+                                Log.d(TAG, "onResponse: login response code = " + response.code());
                                 try {
                                     JSONObject jsonObject = new JSONObject(body);
                                     Auth auth = new Auth(jsonObject);
@@ -93,29 +115,28 @@ public class LoginFragment extends Fragment {
                                         @Override
                                         public void run() {
                                             mListener.authSuccessfully(auth);
-                                            Toast.makeText(getActivity(), "Login Successful", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(getActivity(), "Login Successful!!!!", Toast.LENGTH_SHORT).show();
                                         }
                                     });
                                 } catch (JSONException e) {
                                     throw new RuntimeException(e);
                                 }
-                            }else {
+                            } else {
+                                Log.d(TAG, "onResponse: Error is = " + response.code());
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        Toast.makeText(getActivity(), "Error!!!!!!!!!!", Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(getActivity(), response.code(), Toast.LENGTH_SHORT).show();
                                     }
                                 });
-
                             }
                         }
                     });
-
                 }
             }
         });
-
     }
+
     LoginFragmentListener mListener;
 
     @Override
@@ -124,7 +145,7 @@ public class LoginFragment extends Fragment {
         mListener = (LoginFragmentListener) context;
     }
 
-    public interface LoginFragmentListener{
+    public interface LoginFragmentListener {
         void authSuccessfully(Auth auth);
     }
 }
