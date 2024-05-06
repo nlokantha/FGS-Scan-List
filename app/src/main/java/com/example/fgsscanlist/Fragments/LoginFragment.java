@@ -1,10 +1,14 @@
 package com.example.fgsscanlist.Fragments;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -79,7 +83,6 @@ public class LoginFragment extends Fragment {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
                     RequestBody requestBody = RequestBody.create(jsonBody.toString(), MediaType.parse("application/json"));
 
                     Request request = new Request.Builder()
@@ -89,7 +92,6 @@ public class LoginFragment extends Fragment {
                             .header("Access-Control-Allow-Headers", "Content-Type")
                             .post(requestBody)
                             .build();
-
                     client.newCall(request).enqueue(new Callback() {
                         @Override
                         public void onFailure(@NonNull Call call, @NonNull IOException e) {
@@ -101,7 +103,6 @@ public class LoginFragment extends Fragment {
                                 }
                             });
                         }
-
                         @Override
                         public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                             if (response.isSuccessful()) {
@@ -126,7 +127,8 @@ public class LoginFragment extends Fragment {
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-//                                        Toast.makeText(getActivity(), response.code(), Toast.LENGTH_SHORT).show();
+//                                        Toast.makeText(getActivity(), "Please Check Your Email and Password ", Toast.LENGTH_SHORT).show();
+                                        loginError();
                                     }
                                 });
                             }
@@ -135,6 +137,26 @@ public class LoginFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void loginError(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View alertDialog = inflater.inflate(R.layout.custom_dialog_login,null);
+        builder.setView(alertDialog);
+
+        AlertDialog alert = builder.create();
+        alert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alert.show();
+
+        AppCompatButton buttonClose = alertDialog.findViewById(R.id.buttonClose);
+        buttonClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alert.dismiss();
+            }
+        });
+
     }
 
     LoginFragmentListener mListener;

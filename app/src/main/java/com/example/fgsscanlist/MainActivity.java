@@ -1,4 +1,4 @@
- package com.example.fgsscanlist;
+package com.example.fgsscanlist;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -8,10 +8,14 @@ import com.example.fgsscanlist.Fragments.HomeFragment;
 import com.example.fgsscanlist.Fragments.LoginFragment;
 import com.example.fgsscanlist.Fragments.ViewFragment;
 import com.example.fgsscanlist.Models.Auth;
+import com.example.fgsscanlist.Models.FgsScanList;
 
- public class MainActivity extends AppCompatActivity implements LoginFragment.LoginFragmentListener,
-         HomeFragment.HomeFragmentListener, ViewFragment.ViewFragmentListener {
-     Auth mAuth;
+import java.util.ArrayList;
+
+public class MainActivity extends AppCompatActivity implements LoginFragment.LoginFragmentListener,
+        HomeFragment.HomeFragmentListener, ViewFragment.ViewFragmentListener {
+    Auth mAuth;
+    ArrayList<FgsScanList> mlists;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,35 +23,38 @@ import com.example.fgsscanlist.Models.Auth;
         setContentView(R.layout.activity_main);
 
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.rootView,new LoginFragment())
+                .replace(R.id.rootView, new LoginFragment())
                 .commit();
     }
-     @Override
-     public void authSuccessfully(Auth auth) {
+
+    @Override
+    public void authSuccessfully(Auth auth) {
         this.mAuth = auth;
         getSupportFragmentManager().beginTransaction()
-                .replace(R.id.rootView,HomeFragment.newInstance(mAuth))
+                .replace(R.id.rootView, HomeFragment.newInstance(mAuth))
                 .commit();
-     }
+    }
 
-     @Override
-     public void gotoViewFragment() {
-         getSupportFragmentManager().beginTransaction()
-                 .replace(R.id.rootView,new ViewFragment())
-                 .addToBackStack(null)
-                 .commit();
-     }
+    @Override
+    public void gotoViewFragment(ArrayList<FgsScanList> lists) {
+        this.mlists = lists;
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.rootView,ViewFragment.newInstance(lists))
+                .addToBackStack(null)
+                .commit();
+    }
 
-     @Override
-     public void logout() {
+    @Override
+    public void logout() {
         mAuth = null;
-         getSupportFragmentManager().beginTransaction()
-                 .replace(R.id.rootView,new LoginFragment())
-                 .commit();
-     }
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.rootView, new LoginFragment())
+                .commit();
+    }
 
-     @Override
-     public void gotoHomeFragment() {
-         getSupportFragmentManager().popBackStack();
-     }
- }
+    @Override
+    public void gotoHomeFragment() {
+        mlists = null;
+        getSupportFragmentManager().popBackStack();
+    }
+}

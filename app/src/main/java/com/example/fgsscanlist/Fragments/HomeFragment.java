@@ -1,10 +1,14 @@
 package com.example.fgsscanlist.Fragments;
 
 import android.content.Context;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 
 import android.util.Log;
@@ -64,7 +68,7 @@ public class HomeFragment extends Fragment {
     }
 
     FragmentHomeBinding binding;
-    List<FgsScanList> lists = new ArrayList<>();
+    ArrayList<FgsScanList> lists = new ArrayList<>();
     private OkHttpClient client;
 
     @Override
@@ -84,11 +88,13 @@ public class HomeFragment extends Fragment {
         binding.editTextNumberOfRows.setText("100");
         binding.editTextSortOrder.setText("asc");
         binding.editTextSortColumn.setText("line");
-        binding.editTextRefNumber.setText("99289");
+//        binding.editTextRefNumber.setText("99289");
 
         binding.buttonView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                lists.clear();
+
                 String search = binding.editTextSearch.getText().toString();
                 String companyCode = binding.editTextCompanyCode.getText().toString();
                 String currentPage = binding.editTextCurrentPage.getText().toString();
@@ -97,7 +103,7 @@ public class HomeFragment extends Fragment {
                 String sortColumn = binding.editTextSortColumn.getText().toString();
                 String refNumber = binding.editTextRefNumber.getText().toString();
                 if (search.isEmpty()) {
-                    Toast.makeText(getActivity(), "Please Enter", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getActivity(), "Please Enter Search Keyword", Toast.LENGTH_SHORT).show();
                 } else if (companyCode.isEmpty()) {
                     Toast.makeText(getActivity(), "Please Enter Company Code", Toast.LENGTH_SHORT).show();
                 } else if (currentPage.isEmpty()) {
@@ -149,13 +155,12 @@ public class HomeFragment extends Fragment {
                                 Gson gson = new Gson();
 //                                FgsScanList fgsScanList= gson.fromJson(body, FgsScanList.class);
                                 FgsScanList[] fgsScanLists = gson.fromJson(body, FgsScanList[].class);
-                                Log.d(TAG, "onResponse: list = "+fgsScanLists.length);
                                 lists.addAll(Arrays.asList(fgsScanLists));
                                 Log.d(TAG, "onResponse: array List = "+lists.size());
                                 getActivity().runOnUiThread(new Runnable() {
                                     @Override
                                     public void run() {
-                                        mListener.gotoViewFragment();
+                                        mListener.gotoViewFragment(lists);
                                     }
                                 });
 
@@ -171,10 +176,38 @@ public class HomeFragment extends Fragment {
         binding.buttonLogout.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                mListener.logout();
+                saveCustomDialog();
             }
         });
 
+    }
+    private void saveCustomDialog(){
+        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
+        builder.setCancelable(false);
+        LayoutInflater inflater = getActivity().getLayoutInflater();
+        View alertDialog = inflater.inflate(R.layout.custom_dialog,null);
+        builder.setView(alertDialog);
+
+        AlertDialog alert = builder.create();
+        alert.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+        alert.show();
+
+        AppCompatButton buttonClose = alertDialog.findViewById(R.id.buttonClose);
+        AppCompatButton buttonConfirm = alertDialog.findViewById(R.id.buttonSelectNext);
+        buttonClose.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alert.dismiss();
+            }
+        });
+
+        buttonConfirm.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mListener.logout();
+                alert.dismiss();
+            }
+        });
     }
 
     HomeFragmentListener mListener;
@@ -186,7 +219,7 @@ public class HomeFragment extends Fragment {
     }
 
     public interface HomeFragmentListener {
-        void gotoViewFragment();
+        void gotoViewFragment(ArrayList<FgsScanList> lists);
 
         void logout();
     }
