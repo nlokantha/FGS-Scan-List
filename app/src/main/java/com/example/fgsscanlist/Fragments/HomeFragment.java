@@ -87,7 +87,10 @@ public class HomeFragment extends Fragment {
         binding.editTextCurrentPage.setText("1");
         binding.editTextNumberOfRows.setText("100");
         binding.editTextSortOrder.setText("asc");
-        binding.editTextSortColumn.setText("line");
+        binding.editTextSortColumn.setText("orderLine");
+        binding.editTextsalesOrderCounterCode.setText("USG");
+        binding.editTextsalesOrderCode.setText("USG2300275");
+        binding.editTextorderLine.setText("20");
 //        binding.editTextRefNumber.setText("99289");
 
         binding.buttonView.setOnClickListener(new View.OnClickListener() {
@@ -101,7 +104,9 @@ public class HomeFragment extends Fragment {
                 String numberOfRows = binding.editTextNumberOfRows.getText().toString();
                 String sortOrder = binding.editTextSortOrder.getText().toString();
                 String sortColumn = binding.editTextSortColumn.getText().toString();
-                String refNumber = binding.editTextRefNumber.getText().toString();
+                String salesOrderCounterCode = binding.editTextsalesOrderCounterCode.getText().toString();
+                String salesOrderCode = binding.editTextsalesOrderCode.getText().toString();
+                String orderLine = binding.editTextorderLine.getText().toString();
                 if (search.isEmpty()) {
                     Toast.makeText(getActivity(), "Please Enter Search Keyword", Toast.LENGTH_SHORT).show();
                 } else if (companyCode.isEmpty()) {
@@ -114,8 +119,12 @@ public class HomeFragment extends Fragment {
                     Toast.makeText(getActivity(), "Please Enter Sort Order", Toast.LENGTH_SHORT).show();
                 } else if (sortColumn.isEmpty()) {
                     Toast.makeText(getActivity(), "Please Enter Sort Column", Toast.LENGTH_SHORT).show();
-                } else if (refNumber.isEmpty()) {
-                    Toast.makeText(getActivity(), "Please Enter Ref Number", Toast.LENGTH_SHORT).show();
+                } else if (salesOrderCounterCode.isEmpty()) {
+                    Toast.makeText(getActivity(), "Please Enter salesOrderCounterCode", Toast.LENGTH_SHORT).show();
+                }else if (salesOrderCode.isEmpty()) {
+                    Toast.makeText(getActivity(), "Please Enter salesOrderCode", Toast.LENGTH_SHORT).show();
+                } else if (orderLine.isEmpty()) {
+                    Toast.makeText(getActivity(), "Please Enter orderLine", Toast.LENGTH_SHORT).show();
                 } else {
                     JSONObject jsonBody = new JSONObject();
                     try {
@@ -125,8 +134,25 @@ public class HomeFragment extends Fragment {
                         jsonBody.put("numberOfRows", numberOfRows);
                         jsonBody.put("sortOrder", sortOrder);
                         jsonBody.put("sortColumn", sortColumn);
-                        jsonBody.put("refNo", refNumber);
+                        jsonBody.put("salesOrderCounterCode", salesOrderCounterCode);
+                        jsonBody.put("salesOrderCode", salesOrderCode);
+                        jsonBody.put("orderLine", orderLine);
                         Log.d(TAG, "onClick: jsonbody to string = "+jsonBody.toString());
+                        /*
+                        Body
+{
+"isSearch": "N",
+"companyCode": "100",
+"currentPage": "1",
+"numberOfRows": "100",
+"sortOrder": "asc",
+"sortColumn": "orderLine",
+"salesOrderCounterCode": "USG",
+"salesOrderCode": "USG2300275",
+"orderLine": "20"
+}
+                         */
+
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
